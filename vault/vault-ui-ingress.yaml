@@ -1,0 +1,24 @@
+# OPTIONAL: expose the Vault UI at https://ecXY-vault.ff26.it through Traefik,
+# instead of port-forwarding. Replace XY with your participant number.
+# The external-dns annotation is the SAME shared Cloudflare tunnel used across
+# the workshop — leave it as is; it creates the public DNS record for you.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vault-ui
+  namespace: vault
+  annotations:
+    external-dns.alpha.kubernetes.io/target: 82051912-b874-49e9-955b-7a73552b75bc.cfargotunnel.com
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: ecXY-vault.ff26.it
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vault-ui
+                port:
+                  number: 8200

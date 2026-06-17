@@ -1,0 +1,37 @@
+# A trivial workload that consumes the secret as an environment variable. It
+# just prints DB_PASSWORD to its logs every 30s so you can (a) confirm the
+# value arrived, and (b) watch it change after a rotation in Step 6.
+#
+# Crucially: this manifest references the K8s Secret by NAME only. The actual
+# password is nowhere in this file, nor anywhere else in Git.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secret-consumer
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: secret-consumer
+  template:
+    metadata:
+      labels:
+        app: secret-consumer
+    spec:
+      serviceAccountName: app-sa
+      containers:
+        - name: app
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "boot: reading DB_PASSWORD from env (value is NOT in any manifest)"
+              while true; do echo "DB_PASSWORD=$DB_PASSWORD"; sleep 30; done
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials   # created by ESO, not by you
+                  key: DB_PASSWORD

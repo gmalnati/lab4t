@@ -1,0 +1,33 @@
+# Helm values for a DEV / LEARNING Vault — a single standalone instance with
+# the UI on. This is intentionally NOT production-shaped: there is no HA, no
+# auto-unseal, no encrypted backend. See README "Going to production" and the
+# commented HA block at the bottom for what changes.
+
+server:
+  standalone:
+    enabled: true
+  dataStorage:
+    enabled: true
+    size: 1Gi
+
+ui:
+  enabled: true
+  serviceType: ClusterIP
+
+# We consume secrets through the External Secrets Operator (ESO), not the
+# Vault Agent sidecar injector — so keep the injector off.
+injector:
+  enabled: false
+
+# ----------------------------------------------------------------------------
+# PRODUCTION SHAPE (for reference — do NOT enable in the lab):
+#
+# server:
+#   ha:
+#     enabled: true
+#     replicas: 3
+#     raft:
+#       enabled: true          # HA without an external storage backend
+#   extraEnvironmentVars:
+#     VAULT_SEAL_TYPE: awskms  # auto-unseal: no manual step on restart
+# ----------------------------------------------------------------------------

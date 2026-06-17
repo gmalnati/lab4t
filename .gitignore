@@ -1,0 +1,9 @@
+.DS_Store
+*.tmp
+.tokensave/
+
+# NEVER commit these — they are the keys to the kingdom.
+vault-init.json
+*.unseal
+*-keys.txt
+cluster-keys.json
